@@ -1,3 +1,82 @@
-WSAFIP
+= WSAFIP
 
-Rutinas para el servicio de Factura Electrónica de la AFIP de Argentina.
+http://github.com/kascote/wsafip
+
+
+== Descripcion
+
+Librería para conectarse con los WebService de la AFIP de Argentina.
+Están implementados los servicios de Autenticación y el de Factura Electrónica.
+
+
+=== Ejempos de uso
+
+* para ejecutar estos ejemplos, como para hacer uso de la librería se debe primero 
+  solicitar un certificado digital. para más informacion http://afip.gov.ar/fe
+
+
+obtener un token de autenticación
+
+ticket = WSAA::WSAAService.request_ticket( :service => 'wsfe',
+                                           :certificate => 'certificado.pem',
+                                           :private_key => 'private.key')
+
+por defecto se trabaja sobre el servicio de homologación de la AFIP, para luego usar el
+servicio en producción y con un certificado con password sobre la clave privada
+
+ticket = WSAA::WSAAService.request_ticket( :service => 'wsfe', 
+                                           :server => :prod,
+                                           :certificate => 'certificado.pem', 
+                                           :private_key => 'private.key',
+                                           :pk_password => 'secret' )
+
+
+
+una vez obtenido el ticket se lo puede utilizar en el servicio de factura electrónica
+de la siguiente manera
+
+
+wsfe = WSFEService.new( ticket, NRO_DE_CUIT_DEL_SOLICITANTE )
+wsfe.requests << { :tipo_doc => 80,       :nro_doc => CUIT_A_PEDIR,  :tipo_cbte => 6,     
+                   :punto_vta => 1,       :cbt_desde => 28,          :cbt_hasta => 28,  
+                   :imp_total => 123.45,  :imp_tot_conc => 0,        :imp_neto => 123.45, 
+                   :impto_liq => 0,       :impto_liq_nri => 0,       :imp_op_ex => 0,
+                   :presta_serv => 0,     :fecha_cbte => '20090413',       
+                   :fecha_serv_desde => '20090401' ,     :fecha_serv_hasta => '20080430', 
+                   :fecha_venc_pago => '20090530' }
+wsfe.do_request
+
+
+
+
+== TODO
+
+* mejorar las rutinas de verificacion del ticket
+* mejorar la documentacion del servicio WSFE
+* completar el resto de las llamadas de WSFE
+
+
+== LICENSE
+
+(The MIT License)
+
+(c) 2009-* Nelson Fernandez, http://nelson.netflux.com.ar
+
+Permission is hereby granted, free of charge, to any person obtaining a copy 
+of this software and associated documentation files (the "Software"), to deal 
+in the Software without restriction, including without limitation the rights 
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell 
+copies of the Software, and to permit persons to whom the Software is 
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
